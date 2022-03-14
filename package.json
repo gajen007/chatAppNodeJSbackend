@@ -1,0 +1,25 @@
+{
+  "name": "chatappbackend",
+  "version": "1.0.0",
+  "description": "backend for chat",
+  "main": "Y",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gajen007/chatAppNodeJSbackend.git"
+  },
+  "keywords": [
+    "chatapp"
+  ],
+  "author": "Gajen",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/gajen007/chatAppNodeJSbackend/issues"
+  },
+  "homepage": "https://github.com/gajen007/chatAppNodeJSbackend#readme",
+  "dependencies": {
+    "express": "^4.17.3"
+  }
+}
