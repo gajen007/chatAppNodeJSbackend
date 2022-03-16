@@ -20,6 +20,10 @@
   },
   "homepage": "https://github.com/gajen007/chatAppNodeJSbackend#readme",
   "dependencies": {
-    "express": "^4.17.3"
+    "cors": "^2.8.5",
+    "express": "^4.17.3",
+    "md5": "^2.3.0",
+    "multer": "^1.4.4",
+    "mysql": "^2.18.1"
   }
 }
