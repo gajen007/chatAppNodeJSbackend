@@ -2,17 +2,56 @@ var http = require('http');
 var express = require('express');
 var app = express();
 var multer = require('multer');
-var upload = multer();
-app.use(upload.array()); 
+var upload = multer({ dest: 'userUploads/' });
+//app.use(upload.array()); 
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 app.use(express.static('public'));
 var cors = require('cors');
-app.use(cors());
+app.use(cors({origin:"http://localhost:8100",methods:['POST','GET']}));
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    res.header("Access-Control-Allow-Methods", "PUT, POST, GET, OPTIONS, DELETE");
+    next();
+});
 var mysql = require('mysql');
 var con = mysql.createConnection({host:"localhost",user:"phpmyadmin",password:"gajen",database:"codersChat"});
 var md5 = require('md5');
 var querystring = require("querystring")
+var fs = require('fs');
+
+app.post('/updateUserProfile', upload.single('fileToUpload'), function (req, res) {
+	let table="users";
+	if(req.body.userName==null||req.body.userEmail==null||req.body.userPassword==null||req.body.userName==""||req.body.userEmail==""||req.body.userPassword==""){
+		return {message:"Insufficient Data! Probably missed something...",result:false};
+	}
+	else{
+		var oldpath = req.file.path;
+		var extension = req.file.originalname.substring(req.file.originalname.indexOf(".")+1,req.file.originalname.length);
+		var newpath = req.file.destination+""+req.body.userID+"."+extension;
+		fs.readFile(oldpath, function (err2, data) {
+			if (err2) throw err2;
+			fs.writeFile(newpath, data, function (err3) {
+				if (err3) throw err3;
+				else{
+					con.query("UPDATE ?? SET email=?, username=?, password=?, avatarURL=? WHERE id=?",[table,req.body.userEmail,req.body.userName,md5(req.body.userPassword),newpath,req.body.userID],function (err1, result) {
+						if (err1) { throw err1; }
+						if (result.affectedRows==1) {
+							res.json({"message":"Data updated successfully","result":true});
+						}
+						else{
+							res.json({"message":"Something wrong","result":false});
+						}
+					});
+				}
+			});
+			fs.unlink(oldpath, function (err4) {
+				if (err4) throw err4;
+			});
+		});
+	}
+});
 
 //let the server listen the at port 8081
 var server = app.listen(8081, function (err) {
@@ -87,13 +126,6 @@ app.get('/getAllContactsAddedByThisUser', function (req, res) {
 		if (err1) { throw err1; }
 		res.send(rows);
 	});
-});
-
-app.post('/updateUserProfile', function (req, res) {
-	//userID
-	//userdisplayName
-	//usermobileNo
-	//fileToUpload
 });
 
 app.post('/newContact', function (req, res) {
